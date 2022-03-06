@@ -1,49 +1,33 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/danilkaz/chartographer/internal/models"
+	"github.com/go-redis/redis/v8"
 	"github.com/joho/godotenv"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"log"
 	"os"
 )
 
-func initDatabaseConfig() models.DatabaseConfig {
-	return models.DatabaseConfig{
-		Host:     os.Getenv("POSTGRES_HOST"),
-		Port:     os.Getenv("POSTGRES_PORT"),
-		Username: os.Getenv("POSTGRES_USER"),
-		Password: os.Getenv("POSTGRES_PASSWORD"),
-		Database: os.Getenv("POSTGRES_DB"),
-	}
-}
+var ctx = context.Background()
 
-func openDatabaseConnection(config models.DatabaseConfig) (*gorm.DB, error) {
-	connectionString := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s",
-		config.Host,
-		config.Port,
-		config.Username,
-		config.Password,
-		config.Database,
-	)
-	connection, err := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
-	if err != nil {
-		return nil, err
+func initRedisConfig() models.RedisConfig {
+	return models.RedisConfig{
+		Host: os.Getenv("REDIS_HOST"),
+		Port: os.Getenv("REDIS_PORT"),
 	}
-	return connection, nil
 }
 
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("No .env file found")
 	}
-	databaseConfig := initDatabaseConfig()
-	databaseConnection, err := openDatabaseConnection(databaseConfig)
-	if err != nil {
-		log.Fatal("Database connection error")
-	}
-	fmt.Println(databaseConnection)
+	redisConfig := initRedisConfig()
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%s", redisConfig.Host, redisConfig.Port),
+		Password: "",
+		DB:       0,
+	})
+	fmt.Println(rdb)
 }

@@ -1,9 +1,6 @@
 package models
 
-type DatabaseConfig struct {
-	Host     string
-	Port     string
-	Username string
-	Password string
-	Database string
+type RedisConfig struct {
+	Host string
+	Port string
 }
