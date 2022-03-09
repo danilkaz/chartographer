@@ -7,8 +7,13 @@ import (
 )
 
 func CreateNewCharta(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(mux.Vars(r))
-	fmt.Println("create")
+	queryParameters, err := convertAllQueryParametersToInt(mux.Vars(r))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+	w.WriteHeader(201)
+	fmt.Println(queryParameters)
 }
 
 func SaveRestoredFragmentOfCharta(w http.ResponseWriter, r *http.Request) {
