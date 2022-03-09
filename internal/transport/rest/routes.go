@@ -9,28 +9,28 @@ func InitRoutes() *mux.Router {
 
 	chartas.
 		Queries(
-			"width", "{width:[0-9]+}",
-			"height", "{height:[0-9]+}",
+			"width", "{width:\\w+}",
+			"height", "{height:\\w+}",
 		).
 		HandlerFunc(CreateNewCharta).
 		Methods("POST")
 
 	withId.
 		Queries(
-			"x", "{x:[0-9]+}",
-			"y", "{y:[0-9]+}",
-			"width", "{width:[0-9]+}",
-			"height", "{height:[0-9]+}",
+			"x", "{x:\\w+}",
+			"y", "{y:\\w+}",
+			"width", "{width:\\w+}",
+			"height", "{height:\\w+}",
 		).
 		HandlerFunc(SaveRestoredFragmentOfCharta).
 		Methods("POST")
 
 	withId.
 		Queries(
-			"x", "{x:[0-9]+}",
-			"y", "{y:[0-9]+}",
-			"width", "{width:[0-9]+}",
-			"height", "{height:[0-9]+}",
+			"x", "{x:\\w+}",
+			"y", "{y:\\w+}",
+			"width", "{width:\\w+}",
+			"height", "{height:\\w+}",
 		).
 		HandlerFunc(GetPartOfCharta).
 		Methods("GET")
