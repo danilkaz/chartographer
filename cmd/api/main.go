@@ -1,19 +1,22 @@
 package main
 
 import (
+	"github.com/danilkaz/chartographer/internal/models"
+	"github.com/danilkaz/chartographer/internal/repository"
+	"github.com/danilkaz/chartographer/internal/service"
 	"github.com/danilkaz/chartographer/internal/transport/rest"
-	"github.com/joho/godotenv"
-	"log"
+	"github.com/google/uuid"
 	"net/http"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("No .env file found")
+	db := map[uuid.UUID]models.Charta{}
+	storage := repository.NewStorage(&db)
+	r := repository.NewRepository(storage)
+	s := service.NewService(r)
+	h := rest.NewHandler(s)
+	err := http.ListenAndServe(":8000", h.InitRoutes())
+	if err != nil {
+		return
 	}
-	server := &http.Server{
-		Addr:    "0.0.0.0:8000",
-		Handler: rest.InitRoutes(),
-	}
-	log.Fatal(server.ListenAndServe())
 }

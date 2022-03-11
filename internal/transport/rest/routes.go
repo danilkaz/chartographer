@@ -2,7 +2,7 @@ package rest
 
 import "github.com/gorilla/mux"
 
-func InitRoutes() *mux.Router {
+func (h *Handler) InitRoutes() *mux.Router {
 	router := mux.NewRouter()
 	chartas := router.PathPrefix("/chartas").Subrouter()
 	withId := chartas.PathPrefix("/{id}").Subrouter()
@@ -12,7 +12,7 @@ func InitRoutes() *mux.Router {
 			"width", "{width:\\w+}",
 			"height", "{height:\\w+}",
 		).
-		HandlerFunc(CreateNewCharta).
+		HandlerFunc(h.CreateNewCharta).
 		Methods("POST")
 
 	withId.
@@ -22,7 +22,7 @@ func InitRoutes() *mux.Router {
 			"width", "{width:\\w+}",
 			"height", "{height:\\w+}",
 		).
-		HandlerFunc(SaveRestoredFragmentOfCharta).
+		HandlerFunc(h.SaveRestoredFragmentOfCharta).
 		Methods("POST")
 
 	withId.
@@ -32,11 +32,11 @@ func InitRoutes() *mux.Router {
 			"width", "{width:\\w+}",
 			"height", "{height:\\w+}",
 		).
-		HandlerFunc(GetPartOfCharta).
+		HandlerFunc(h.GetPartOfCharta).
 		Methods("GET")
 
 	withId.
-		HandleFunc("/", DeleteCharta).
+		HandleFunc("/", h.DeleteCharta).
 		Methods("DELETE")
 
 	return router

@@ -1,17 +1,19 @@
 package service
 
 import (
+	"github.com/google/uuid"
 	"image"
 	"image/color"
 )
 
 type BitmapImage struct {
+	uuid.UUID
 	image.Image
 	colors map[image.Point]color.Color
 }
 
 func NewBitmapImage(bitmapImage image.Image) *BitmapImage {
-	return &BitmapImage{bitmapImage, map[image.Point]color.Color{}}
+	return &BitmapImage{uuid.New(), bitmapImage, map[image.Point]color.Color{}}
 }
 
 func (b *BitmapImage) SetColor(x, y int, color color.Color) {
