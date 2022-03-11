@@ -4,6 +4,7 @@ import (
 	"github.com/danilkaz/chartographer/internal/models"
 	"github.com/danilkaz/chartographer/internal/repository"
 	"github.com/google/uuid"
+	"image"
 )
 
 type ChartaService struct {
@@ -15,8 +16,9 @@ func NewChartaService(repo *repository.Repository) *ChartaService {
 }
 
 func (s *ChartaService) Create(width, height int) (uuid.UUID, error) {
-	var c uuid.UUID
-	return c, nil
+	img := image.NewRGBA(image.Rect(0, 0, width, height))
+	charta := models.NewCharta(img)
+	return s.Charta.Add(*charta)
 }
 
 func (s *ChartaService) SaveRestoredFragment(x, y, width, height int) error {

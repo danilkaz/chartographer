@@ -6,7 +6,7 @@ import (
 )
 
 type Charta interface {
-	Create(width, height int) (uuid.UUID, error)
+	Add(charta models.Charta) (uuid.UUID, error)
 	GetById(id uuid.UUID) (models.Charta, error)
 	Update(id uuid.UUID, new models.Charta) error
 	Delete(id uuid.UUID) error

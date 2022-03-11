@@ -1,11 +1,20 @@
 package models
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+	"image"
+	"image/color"
+)
 
 type Charta struct {
-	Id uuid.UUID
+	Id            uuid.UUID
+	Image         image.Image
+	ChangedPixels map[image.Point]color.Color
 }
 
-func NewCharta() *Charta {
-	return &Charta{}
+func NewCharta(img image.Image) *Charta {
+	return &Charta{
+		Image:         img,
+		ChangedPixels: map[image.Point]color.Color{},
+	}
 }
