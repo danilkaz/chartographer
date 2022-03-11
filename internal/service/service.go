@@ -8,9 +8,9 @@ import (
 
 type Charta interface {
 	Create(width, height int) (uuid.UUID, error)
-	SaveRestoredFragment(x, y, width, height int) error
-	GetPart(x, y, width, height int) (models.Charta, error)
-	Delete() error
+	SaveRestoredFragment(id uuid.UUID, x, y, width, height int, fragment models.Charta) error
+	GetPart(id uuid.UUID, x, y, width, height int) (models.Charta, error)
+	Delete(id uuid.UUID) error
 }
 
 type Service struct {

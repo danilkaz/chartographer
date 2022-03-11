@@ -18,4 +18,9 @@ func main() {
 	if err != nil {
 		return
 	}
+	//file, _ := os.Open("image.bmp")
+	//img, _ := bmp.Decode(file)
+	//file2, _ := os.Create("imagenew.bmp")
+	//charta := models.Charta{Image: img}
+	//bmp.Encode(file2, charta.SubCharta(10, 10, 500, 200))
 }
