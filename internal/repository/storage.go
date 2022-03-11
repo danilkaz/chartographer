@@ -22,6 +22,11 @@ func (s *Storage) Add(charta models.Charta) (uuid.UUID, error) {
 	id := uuid.New()
 	charta.Id = id
 	file, err := os.Create(fmt.Sprintf("%s.bmp", id))
+	defer func(file *os.File) {
+		if file.Close() != nil {
+			return
+		}
+	}(file)
 	if err != nil {
 		return uuid.Nil, err
 	}
