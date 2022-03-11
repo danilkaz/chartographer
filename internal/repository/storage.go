@@ -17,15 +17,15 @@ func (s *Storage) Create(width, height int) (uuid.UUID, error) {
 	return uuid.New(), nil
 }
 
-func (s *Storage) SaveRestoredFragment(x, y, width, height int) error {
-	return nil
-}
-
-func (s *Storage) GetPart(x, y, width, height int) (models.Charta, error) {
+func (s *Storage) GetById(id uuid.UUID) (models.Charta, error) {
 	var c models.Charta
 	return c, nil
 }
 
-func (s *Storage) Delete() error {
+func (s *Storage) Update(id uuid.UUID, new models.Charta) error {
+	return nil
+}
+
+func (s *Storage) Delete(id uuid.UUID) error {
 	return nil
 }
