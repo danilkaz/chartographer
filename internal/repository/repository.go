@@ -2,7 +2,6 @@ package repository
 
 import (
 	"github.com/danilkaz/chartographer/internal/models"
-	"github.com/danilkaz/chartographer/internal/repository/storage"
 	"github.com/google/uuid"
 )
 
@@ -17,6 +16,6 @@ type Repository struct {
 	Charta
 }
 
-func NewRepository(storage *storage.Storage) *Repository {
-	return &Repository{Charta: storage}
+func NewRepository(storage map[uuid.UUID]models.Charta) *Repository {
+	return &Repository{Charta: NewStorage(&storage)}
 }

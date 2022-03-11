@@ -1,4 +1,4 @@
-package storage
+package repository
 
 import (
 	"github.com/danilkaz/chartographer/internal/models"
