@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/danilkaz/chartographer/internal/models"
 	"github.com/danilkaz/chartographer/internal/repository"
 	"github.com/danilkaz/chartographer/internal/service"
 	"github.com/danilkaz/chartographer/internal/transport/rest"
@@ -10,7 +9,7 @@ import (
 )
 
 func main() {
-	db := map[uuid.UUID]models.Charta{}
+	db := map[uuid.UUID]bool{}
 	r := repository.NewRepository(db)
 	s := service.NewService(r)
 	h := rest.NewHandler(s)
