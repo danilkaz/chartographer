@@ -16,6 +16,6 @@ type Repository struct {
 	Charta
 }
 
-func NewRepository(storage map[uuid.UUID]models.Charta) *Repository {
+func NewRepository(storage map[uuid.UUID]bool) *Repository {
 	return &Repository{Charta: NewStorage(&storage)}
 }
