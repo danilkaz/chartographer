@@ -4,20 +4,29 @@ import (
 	"github.com/google/uuid"
 	"image"
 	"math"
+	"sync"
 )
 
 type Charta struct {
 	Id    uuid.UUID
-	Image BitmapImage
+	Image *BitmapImage
+	sync.Mutex
 }
 
 func NewCharta(img image.Image) *Charta {
 	return &Charta{
-		Image: *NewBitmapImage(img),
+		Image: NewBitmapImage(img),
 	}
 }
 
-func (c *Charta) ChangePartOfImage(x, y, width, height int, otherCharta Charta) {
+func NewChartaWithId(id uuid.UUID, img image.Image) *Charta {
+	return &Charta{
+		Id:    id,
+		Image: NewBitmapImage(img),
+	}
+}
+
+func (c *Charta) ChangePartOfImage(x, y, width, height int, otherCharta *Charta) {
 	bounds := c.Image.Bounds()
 	startRow := int(math.Max(0, float64(y)))
 	endRow := int(math.Min(float64(bounds.Dy()), float64(y+height)))
