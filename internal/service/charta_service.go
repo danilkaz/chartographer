@@ -8,7 +8,7 @@ import (
 )
 
 type ChartaService struct {
-	repository.Charta
+	repository.ChartaRepository
 }
 
 func NewChartaService(repo *repository.Repository) *ChartaService {
@@ -18,29 +18,29 @@ func NewChartaService(repo *repository.Repository) *ChartaService {
 func (s *ChartaService) Create(width, height int) (uuid.UUID, error) {
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
 	charta := models.NewCharta(img)
-	return s.Charta.Add(*charta)
+	return s.ChartaRepository.Add(charta)
 }
 
-func (s *ChartaService) SaveRestoredFragment(id uuid.UUID, x, y, width, height int, fragment models.Charta) error {
-	charta, err := s.Charta.GetById(id)
+func (s *ChartaService) SaveRestoredFragment(id uuid.UUID, x, y, width, height int, fragment *models.Charta) error {
+	charta, err := s.ChartaRepository.GetById(id)
 	if err != nil {
 		return err
 	}
 	charta.ChangePartOfImage(x, y, width, height, fragment)
-	if err = s.Charta.Update(id, charta); err != nil {
+	if err = s.ChartaRepository.Update(id, charta); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *ChartaService) GetPart(id uuid.UUID, x, y, width, height int) (models.Charta, error) {
-	charta, err := s.Charta.GetById(id)
+func (s *ChartaService) GetPart(id uuid.UUID, x, y, width, height int) (*models.Charta, error) {
+	charta, err := s.ChartaRepository.GetById(id)
 	if err != nil {
 		return charta, err
 	}
-	return models.Charta{Image: *models.NewBitmapImage(charta.SubCharta(x, y, width, height))}, nil
+	return &models.Charta{Image: models.NewBitmapImage(charta.SubCharta(x, y, width, height))}, nil
 }
 
 func (s *ChartaService) Delete(id uuid.UUID) error {
-	return s.Charta.Delete(id)
+	return s.ChartaRepository.Delete(id)
 }
