@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/danilkaz/chartographer/internal/models"
+	chartaErrors "github.com/danilkaz/chartographer/internal/models/errors"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"golang.org/x/image/bmp"
@@ -58,6 +59,8 @@ func (h *Handler) SaveRestoredFragmentOfCharta(w http.ResponseWriter, r *http.Re
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
 			w.WriteHeader(http.StatusNotFound)
+		} else if errors.Is(err, chartaErrors.NotChangedError{}) {
+			w.WriteHeader(http.StatusBadRequest)
 		} else {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
@@ -82,6 +85,8 @@ func (h *Handler) GetPartOfCharta(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
 			w.WriteHeader(http.StatusNotFound)
+		} else if errors.Is(err, chartaErrors.OutOfScopeError{}) {
+			w.WriteHeader(http.StatusBadRequest)
 		} else {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
