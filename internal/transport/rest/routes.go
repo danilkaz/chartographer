@@ -17,8 +17,8 @@ func (h *Handler) InitRoutes() *mux.Router {
 
 	withId.
 		Queries(
-			"x", "{x:\\w+}",
-			"y", "{y:\\w+}",
+			"x", "{x:[\\w\\-]+}",
+			"y", "{y:[\\w+\\-]+}",
 			"width", "{width:\\w+}",
 			"height", "{height:\\w+}",
 		).
@@ -27,8 +27,8 @@ func (h *Handler) InitRoutes() *mux.Router {
 
 	withId.
 		Queries(
-			"x", "{x:\\w+}",
-			"y", "{y:\\w+}",
+			"x", "{x:[\\w+\\-]+}",
+			"y", "{y:[\\w+\\-]+}",
 			"width", "{width:\\w+}",
 			"height", "{height:\\w+}",
 		).
