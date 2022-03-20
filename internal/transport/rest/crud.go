@@ -22,18 +22,13 @@ func (h *Handler) CreateNewCharta(w http.ResponseWriter, r *http.Request) {
 	}
 	id, err := h.services.Create(width, height)
 	if err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
-			w.WriteHeader(http.StatusNotFound)
-		} else {
-			w.WriteHeader(http.StatusInternalServerError)
-		}
-		return
-	}
-	if _, err = fmt.Fprint(w, id); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
+	if _, err = fmt.Fprint(w, id); err != nil {
+		w.WriteHeader(http.StatusInternalServerError) // <- not working, didn't know how to do it differently
+	}
 }
 
 func (h *Handler) SaveRestoredFragmentOfCharta(w http.ResponseWriter, r *http.Request) {
@@ -93,7 +88,7 @@ func (h *Handler) GetPartOfCharta(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err = bmp.Encode(w, subCharta.Image); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest) // <- not working too, likewise CreateNewCharta
 	}
 }
 
