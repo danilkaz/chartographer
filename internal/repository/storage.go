@@ -1,11 +1,11 @@
 package repository
 
 import (
-	"errors"
 	"fmt"
 	"github.com/danilkaz/chartographer/internal/models"
 	"github.com/google/uuid"
 	"golang.org/x/image/bmp"
+	"io/fs"
 	"os"
 	"path/filepath"
 )
@@ -33,7 +33,7 @@ func (s *Storage) GetById(id uuid.UUID) (*models.Charta, error) {
 	var charta *models.Charta
 	_, exists := (*s.existingElements)[id]
 	if !exists {
-		return charta, errors.New(fmt.Sprintf("ChartaRepository with id = %s doesn't exist", id))
+		return charta, fs.ErrNotExist
 	}
 	charta, err := s.ReadFromFile(id.String())
 	if err != nil {
@@ -45,7 +45,7 @@ func (s *Storage) GetById(id uuid.UUID) (*models.Charta, error) {
 func (s *Storage) Update(id uuid.UUID, newCharta *models.Charta) error {
 	_, exists := (*s.existingElements)[id]
 	if !exists {
-		return errors.New(fmt.Sprintf("ChartaRepository with id = %s doesn't exist", id))
+		return fs.ErrNotExist
 	}
 	charta, err := s.ReadFromFile(id.String())
 	if err != nil {
@@ -60,7 +60,7 @@ func (s *Storage) Update(id uuid.UUID, newCharta *models.Charta) error {
 
 func (s *Storage) Delete(id uuid.UUID) error {
 	if _, exists := (*s.existingElements)[id]; !exists {
-		return errors.New(fmt.Sprintf("ChartaRepository with id = %s doesn't exist", id))
+		return fs.ErrNotExist
 	}
 	delete(*s.existingElements, id)
 	filePath := filepath.Join(s.directoryPath, fmt.Sprintf("%s.bmp", id.String()))
