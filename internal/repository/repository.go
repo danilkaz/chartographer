@@ -5,17 +5,17 @@ import (
 	"github.com/google/uuid"
 )
 
-type Charta interface {
-	Add(charta models.Charta) (uuid.UUID, error)
-	GetById(id uuid.UUID) (models.Charta, error)
-	Update(id uuid.UUID, new models.Charta) error
+type ChartaRepository interface {
+	Add(charta *models.Charta) (uuid.UUID, error)
+	GetById(id uuid.UUID) (*models.Charta, error)
+	Update(id uuid.UUID, new *models.Charta) error
 	Delete(id uuid.UUID) error
 }
 
 type Repository struct {
-	Charta
+	ChartaRepository
 }
 
-func NewRepository(storage map[uuid.UUID]bool) *Repository {
-	return &Repository{Charta: NewStorage(&storage)}
+func NewRepository(path string) *Repository {
+	return &Repository{ChartaRepository: NewStorage(path)}
 }
