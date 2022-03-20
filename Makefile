@@ -1,13 +1,10 @@
-default: clean test build run
+default: test build run
 
 test:
-	go test
+	go test ./...
 
 build:
-	go build -o build/app
+	go build -o app ./cmd/api/main.go
 
 run:
-	./build/app ${ARGS}
-
-clean:
-	rm -rf build
+	./app ${ARGS}
