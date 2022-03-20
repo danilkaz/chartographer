@@ -48,7 +48,7 @@ func (h *Handler) SaveRestoredFragmentOfCharta(w http.ResponseWriter, r *http.Re
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	err = h.services.SaveRestoredFragment(id, x, y, width, height, *models.NewCharta(img))
+	err = h.services.SaveRestoredFragment(id, x, y, width, height, models.NewCharta(img))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -74,7 +74,7 @@ func (h *Handler) GetPartOfCharta(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	if err = bmp.Encode(w, &subCharta.Image); err != nil {
+	if err = bmp.Encode(w, subCharta.Image); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
