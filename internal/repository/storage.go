@@ -7,19 +7,19 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/image/bmp"
 	"os"
-	"sync"
+	"path/filepath"
 )
 
 type Storage struct {
-	mu               sync.Mutex
+	directoryPath    string
 	existingElements *map[uuid.UUID]bool
 }
 
-func NewStorage(storage *map[uuid.UUID]bool) *Storage {
-	return &Storage{existingElements: storage}
+func NewStorage(path string) *Storage {
+	return &Storage{directoryPath: path, existingElements: &map[uuid.UUID]bool{}}
 }
 
-func (s *Storage) Add(charta models.Charta) (uuid.UUID, error) {
+func (s *Storage) Add(charta *models.Charta) (uuid.UUID, error) {
 	id := uuid.New()
 	charta.Id = id
 	(*s.existingElements)[id] = true
@@ -29,26 +29,25 @@ func (s *Storage) Add(charta models.Charta) (uuid.UUID, error) {
 	return id, nil
 }
 
-func (s *Storage) GetById(id uuid.UUID) (models.Charta, error) {
-	var charta models.Charta
+func (s *Storage) GetById(id uuid.UUID) (*models.Charta, error) {
+	var charta *models.Charta
 	_, exists := (*s.existingElements)[id]
 	if !exists {
-		return charta, errors.New(fmt.Sprintf("Charta with id = %s doesn't exist", id))
+		return charta, errors.New(fmt.Sprintf("ChartaRepository with id = %s doesn't exist", id))
 	}
-	charta, err := s.ReadFromFile(id)
+	charta, err := s.ReadFromFile(id.String())
 	if err != nil {
 		return charta, err
 	}
 	return charta, nil
 }
 
-func (s *Storage) Update(id uuid.UUID, newCharta models.Charta) error {
-	var charta models.Charta
+func (s *Storage) Update(id uuid.UUID, newCharta *models.Charta) error {
 	_, exists := (*s.existingElements)[id]
 	if !exists {
-		return errors.New(fmt.Sprintf("Charta with id = %s doesn't exist", id))
+		return errors.New(fmt.Sprintf("ChartaRepository with id = %s doesn't exist", id))
 	}
-	charta, err := s.ReadFromFile(id)
+	charta, err := s.ReadFromFile(id.String())
 	if err != nil {
 		return err
 	}
@@ -61,18 +60,20 @@ func (s *Storage) Update(id uuid.UUID, newCharta models.Charta) error {
 
 func (s *Storage) Delete(id uuid.UUID) error {
 	if _, exists := (*s.existingElements)[id]; !exists {
-		return errors.New(fmt.Sprintf("Charta with id = %s doesn't exist", id))
+		return errors.New(fmt.Sprintf("ChartaRepository with id = %s doesn't exist", id))
 	}
 	delete(*s.existingElements, id)
-	if err := os.Remove(fmt.Sprintf("%s.bmp", id.String())); err != nil {
+	filePath := filepath.Join(s.directoryPath, fmt.Sprintf("%s.bmp", id.String()))
+	if err := os.Remove(filePath); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *Storage) ReadFromFile(id uuid.UUID) (models.Charta, error) {
-	var charta models.Charta
-	file, err := os.Open(fmt.Sprintf("%s.bmp", id))
+func (s *Storage) ReadFromFile(fileName string) (*models.Charta, error) {
+	var charta *models.Charta
+	filePath := filepath.Join(s.directoryPath, fmt.Sprintf("%s.bmp", fileName))
+	file, err := os.Open(filePath)
 	defer func(file *os.File) {
 		if file.Close() != nil {
 			return
@@ -85,11 +86,19 @@ func (s *Storage) ReadFromFile(id uuid.UUID) (models.Charta, error) {
 	if err != nil {
 		return charta, err
 	}
-	return *models.NewCharta(decoded), nil
+	id, err := uuid.Parse(fileName)
+	if err != nil {
+		return charta, err
+	}
+	charta = models.NewChartaWithId(id, decoded)
+	return charta, nil
 }
 
-func (s *Storage) WriteToFile(charta models.Charta) error {
-	file, err := os.Create(fmt.Sprintf("%s.bmp", charta.Id))
+func (s *Storage) WriteToFile(charta *models.Charta) error {
+	charta.Lock()
+	defer charta.Unlock()
+	filePath := filepath.Join(s.directoryPath, fmt.Sprintf("%s.bmp", charta.Id))
+	file, err := os.Create(filePath)
 	defer func(file *os.File) {
 		if file.Close() != nil {
 			return
@@ -98,7 +107,7 @@ func (s *Storage) WriteToFile(charta models.Charta) error {
 	if err != nil {
 		return err
 	}
-	err = bmp.Encode(file, &charta.Image)
+	err = bmp.Encode(file, charta.Image)
 	if err != nil {
 		return err
 	}
