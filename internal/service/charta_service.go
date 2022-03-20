@@ -26,7 +26,10 @@ func (s *ChartaService) SaveRestoredFragment(id uuid.UUID, x, y, width, height i
 	if err != nil {
 		return err
 	}
-	charta.ChangePartOfImage(x, y, width, height, fragment)
+	err = charta.ChangePartOfImage(x, y, width, height, fragment)
+	if err != nil {
+		return err
+	}
 	if err = s.ChartaRepository.Update(id, charta); err != nil {
 		return err
 	}
@@ -38,7 +41,12 @@ func (s *ChartaService) GetPart(id uuid.UUID, x, y, width, height int) (*models.
 	if err != nil {
 		return charta, err
 	}
-	return &models.Charta{Image: models.NewBitmapImage(charta.SubCharta(x, y, width, height))}, nil
+	subImage, err := charta.GetSubImage(x, y, width, height)
+	subImageCharta := &models.Charta{Image: models.NewBitmapImage(subImage)}
+	if err != nil {
+		return subImageCharta, err
+	}
+	return subImageCharta, nil
 }
 
 func (s *ChartaService) Delete(id uuid.UUID) error {
