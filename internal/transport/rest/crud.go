@@ -88,7 +88,7 @@ func (h *Handler) GetPartOfCharta(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err = bmp.Encode(w, subCharta.Image); err != nil {
-		w.WriteHeader(http.StatusBadRequest) // <- not working too, likewise CreateNewCharta
+		w.WriteHeader(http.StatusInternalServerError) // <- not working too, likewise CreateNewCharta
 	}
 }
 
