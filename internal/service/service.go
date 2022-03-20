@@ -8,8 +8,8 @@ import (
 
 type Charta interface {
 	Create(width, height int) (uuid.UUID, error)
-	SaveRestoredFragment(id uuid.UUID, x, y, width, height int, fragment models.Charta) error
-	GetPart(id uuid.UUID, x, y, width, height int) (models.Charta, error)
+	SaveRestoredFragment(id uuid.UUID, x, y, width, height int, fragment *models.Charta) error
+	GetPart(id uuid.UUID, x, y, width, height int) (*models.Charta, error)
 	Delete(id uuid.UUID) error
 }
 
