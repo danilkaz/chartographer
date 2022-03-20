@@ -30,20 +30,19 @@ func main() {
 	if err != nil {
 		return
 	}
-	path := filepath.Join(wd, filepath.Dir(os.Args[1]))
+	storagePath := filepath.Join(wd, filepath.Dir(os.Args[1]))
 
-	if err = os.MkdirAll(path, os.ModePerm); err != nil {
-		log.Fatalf("Unable to create directory %s", path)
+	if err = os.MkdirAll(storagePath, os.ModePerm); err != nil {
+		log.Fatalf("Unable to create directory %s", storagePath)
 	}
 
-	r := repository.NewRepository(path)
-	s := service.NewService(r)
-	h := rest.NewHandler(s)
+	repo := repository.NewRepository(storagePath)
+	handler := rest.NewHandler(service.NewService(repo))
 
 	server := internal.NewServer()
 
 	go func() {
-		if err = server.Run(port, h.InitRoutes()); err != nil {
+		if err = server.Run(port, handler.InitRoutes()); err != nil {
 			log.Fatal("Server run error")
 		}
 	}()
