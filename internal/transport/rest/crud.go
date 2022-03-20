@@ -1,11 +1,13 @@
 package rest
 
 import (
+	"errors"
 	"fmt"
 	"github.com/danilkaz/chartographer/internal/models"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"golang.org/x/image/bmp"
+	"io/fs"
 	"net/http"
 )
 
@@ -19,14 +21,18 @@ func (h *Handler) CreateNewCharta(w http.ResponseWriter, r *http.Request) {
 	}
 	id, err := h.services.Create(width, height)
 	if err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		return
+	}
+	if _, err = fmt.Fprint(w, id); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-	if _, err := fmt.Fprint(w, id); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
 }
 
 func (h *Handler) SaveRestoredFragmentOfCharta(w http.ResponseWriter, r *http.Request) {
@@ -40,18 +46,21 @@ func (h *Handler) SaveRestoredFragmentOfCharta(w http.ResponseWriter, r *http.Re
 	}
 	id, err := uuid.Parse(vars["id"])
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	img, err := bmp.Decode(r.Body)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	err = h.services.SaveRestoredFragment(id, x, y, width, height, models.NewCharta(img))
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		if errors.Is(err, fs.ErrNotExist) {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 	}
 }
 
@@ -66,17 +75,20 @@ func (h *Handler) GetPartOfCharta(w http.ResponseWriter, r *http.Request) {
 	}
 	id, err := uuid.Parse(vars["id"])
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	subCharta, err := h.services.GetPart(id, x, y, width, height)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		if errors.Is(err, fs.ErrNotExist) {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 		return
 	}
 	if err = bmp.Encode(w, subCharta.Image); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		w.WriteHeader(http.StatusBadRequest)
 	}
 }
 
@@ -88,11 +100,14 @@ func (h *Handler) DeleteCharta(w http.ResponseWriter, r *http.Request) {
 	}
 	id, err := uuid.Parse(vars["id"])
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	if err = h.services.Delete(id); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		if errors.Is(err, fs.ErrNotExist) {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 	}
 }
